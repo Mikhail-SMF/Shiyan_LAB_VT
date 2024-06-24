@@ -1,0 +1,46 @@
+﻿@using Instruments.Domain.Entities
+@using Shiyan.Blazor.Services
+@implements IDisposable
+@rendermode InteractiveServer
+
+<h3>Интсрументы</h3>
+@if (ProductService.Products != null && ProductService.Products.Count() != 0)
+{
+    <table class="table table-striped">
+        <thead>
+        <th>Название</th>
+        <th></th>
+            @foreach (var item in ProductService.Products)
+            {
+            <tr>
+                <td>@item.Name</td>
+                <td>
+                    <button class="btn btn-outline-dark"
+                            @onclick="@(()=>OnInstrumentsSelected(item.Id))">
+                        Подробно
+                    </button>
+                </td>
+            </tr>
+            }
+        </thead>
+    </table>
+}
+
+@code {
+    [CascadingParameter]
+    public IProductService<Instrument> ProductService { get; set; }
+    [Parameter]
+    public EventCallback<int> InstrumentsSelected { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        ProductService.ListChanged += StateHasChanged;
+    }
+    public async void OnInstrumentsSelected(int id)
+    {
+        await InstrumentsSelected.InvokeAsync(id);
+    }
+    public void Dispose()
+    {
+        ProductService.ListChanged -= StateHasChanged;
+    }
+}

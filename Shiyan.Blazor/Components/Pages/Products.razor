@@ -1,0 +1,28 @@
+﻿@page "/products"
+@rendermode InteractiveServer
+@using Instruments.Domain.Entities
+@using Instruments.Domain.Models
+@using Shiyan.Blazor.Components.ProductComponents
+@using Shiyan.Blazor.Services
+
+<CascadingValue Value="ProductService">
+    <InstrumentsList InstrumentsSelected="ShowDetails" />
+    <Pager />
+</CascadingValue>
+<InstrumentsDetails Instrument="SelectedInstruments" />
+
+@code {
+
+    [Inject] IProductService<Instrument> ProductService { get; set; }
+
+    [Parameter]
+    public Instrument SelectedInstruments { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await ProductService.GetInstruments();
+    }
+    void ShowDetails(int id)
+    {
+        SelectedInstruments = ProductService.Products.First(d => d.Id == id);
+    }
+}
